@@ -1,0 +1,1 @@
+PATH=$PATH:$THIRDPARTY_SOURCE/arcanist/bin/
