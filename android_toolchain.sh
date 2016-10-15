@@ -1,2 +1,3 @@
 export ANDROID_HOME=~/android-sdk-macosx
-PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
+export ANDROID_SDK_HOME=$ANDROID_HOME
+PATH=$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH
