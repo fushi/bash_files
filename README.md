@@ -8,7 +8,7 @@ Files to `source` in bash
 ### aliases.sh
 > Various aliases and functions I find useful
 
-### bash_prompt.sh 
+### bash_prompt.sh
 > An enhanced prompt that I stole from a coworker, and then enhanced.
 * Shows which virtualenv is currently active (if any)
 * Shows current git branch and status (if any) via color
@@ -16,13 +16,11 @@ Files to `source` in bash
 * Shows date/time
 * Shows current working directory
 * Shows current user
-* Shows current host
-
-### android_toolchain.sh
-> An integration of the Android SDK toolchain
-
-### arcanist_toolchain.sh
-> An integration of the Arcanist (Phabricator) toolchain
+* Shows current host=
 
 ### gpg_toolchain.sh
 > An integration of the GPG toolchain
+
+
+### virtualenv_toolchain.sh
+> An integration of the virtualenv toolchain
