@@ -34,92 +34,83 @@ HOSTCOLOR="$FGGRBD"
 
 # Detect whether the current directory is a git repository.
 function is_git_repository {
-git branch > /dev/null 2>&1
+  git branch > /dev/null 2>&1
 }
 
 # Determine the branch/state information for this git repository.
 function set_git_branch {
-# Capture the output of the "git status" command.
-git_status="$(git status 2> /dev/null)"
+  # Capture the output of the "git status" command.
+  git_status="$(git status 2> /dev/null)"
 
-# Set color based on clean/staged/dirty.
-if [[ ${git_status} =~ "working tree clean" ]]; then
-state=$FGGN
-elif [[ ${git_status} =~ "Changes to be committed" ]]; then
-state=$FGYLBD
-else
-state=$FGRD
-fi
+  # Set color based on clean/staged/dirty.
+  if [[ ${git_status} =~ "working tree clean" ]]; then
+    state=$FGGN
+  elif [[ ${git_status} =~ "Changes to be committed" ]]; then
+    state=$FGYLBD
+  else
+    state=$FGRD
+  fi
 
-# Set arrow icon based on status against remote.
-remote_pattern="# Your branch is (.*) of"
-if [[ ${git_status} =~ ${remote_pattern} ]]; then
-if [[ ${BASH_REMATCH[1]} == "ahead" ]]; then
-remote="↑"
-else
-remote="↓"
-fi
-else
-remote=""
-fi
-diverge_pattern="# Your branch and (.*) have diverged"
-if [[ ${git_status} =~ ${diverge_pattern} ]]; then
-remote="↕"
-fi
+  # Set arrow icon based on status against remote.
+  remote_pattern="Your branch is (.*) of"
+  if [[ ${git_status} =~ ${remote_pattern} ]]; then
+    if [[ ${BASH_REMATCH[1]} == "ahead" ]]; then
+      remote="↑"
+    else
+      remote="↓"
+    fi
+  else
+    remote=""
+  fi
 
-# Get the name of the branch.
-branch_pattern="^On branch ([^${IFS}]*)"
-if [[ ${git_status} =~ ${branch_pattern} ]]; then
-branch=${BASH_REMATCH[1]}
-fi
+  diverge_pattern="Your branch and (.*) have diverged"
+  if [[ ${git_status} =~ ${diverge_pattern} ]]; then
+    remote="↕"
+  fi
 
-# Set the final branch string.
-BRANCH="${state}[${branch}]${remote}$RESET"
+  # Get the name of the branch.
+  branch_pattern="^On branch ([^${IFS}]*)"
+  if [[ ${git_status} =~ ${branch_pattern} ]]; then
+    branch=${BASH_REMATCH[1]}
+  fi
+
+  # Set the final branch string.
+  BRANCH="${state}[${branch}]$RESET${remote}"
 }
 
 # Return the prompt symbol to use, colorized based on the return value of the
 # previous command.
 function set_prompt_symbol () {
-# echo "set_prompt_symbol"
-if test $1 -eq 0 ; then
-PROMPT_SYMBOL="⌘"
-else
-PROMPT_SYMBOL="\[\033[0;31m\]⌘\[\033[0m\]"
-fi
+  # echo "set_prompt_symbol"
+  if test $1 -eq 0 ; then
+    PROMPT_SYMBOL="⌘"
+  else
+    PROMPT_SYMBOL="${FGRD}⌘${RESET}"
+  fi
 }
 
 # Set the full bash prompt.
 function set_bash_prompt () {
-# echo "set_bash_prompt"
-# Set the PROMPT_SYMBOL variable. We do this first so we don't lose the
-# return value of the last command.
-set_prompt_symbol $?
+  # echo "set_bash_prompt"
+  # Set the PROMPT_SYMBOL variable. We do this first so we don't lose the
+  # return value of the last command.
+  set_prompt_symbol $?
 
-# Set the BRANCH variable.
-if is_git_repository ; then
-set_git_branch
-else
-BRANCH=''
-fi
+  # Set the BRANCH variable.
+  if is_git_repository ; then
+    set_git_branch
+  else
+    BRANCH=''
+  fi
 
-if [ -n "$VIRTUAL_ENV" ] ; then
-VENV_STRING="(`basename \"$VIRTUAL_ENV\"`) "
-else
-VENV_STRING=""
-fi
+  if [ -n "$VIRTUAL_ENV" ] ; then
+    VENV_STRING="(`basename \"$VIRTUAL_ENV\"`) "
+  else
+    VENV_STRING=""
+  fi
 
-# Fill spaces between the left and right halves
-strippedbranch=`echo $BRANCH | sed 's|\\\\\\[[^]]*\\]||g'`
-lefthalf="$VENV_STRING`whoami`@`hostname -s` `pwd | sed "s|$HOME|~|"` $strippedbranch"
-righthalf=`date '+%a %b %d %T'`
-let fillsize=${COLUMNS}-${#lefthalf}-${#righthalf}-1
-fill=`printf ' %.0s' {1..300}` # 300 spaces
-fill=${fill:0:$fillsize}
-
-# Set the bash prompt variable.
-PS1="\n$FGGR\u@$HOSTCOLOR\h$RESET $FGGR\w$RESET ${BRANCH}$fill$FGGR\d \T$RESET\n\
-$VENV_STRING${PROMPT_SYMBOL} "
-
+  # Set the bash prompt variable.
+  PS1="$FGGR\u@$HOSTCOLOR\h$RESET $VENV_STRING$FGGR\w$RESET ${BRANCH}\n${PROMPT_SYMBOL} "
 }
 
 # Tell bash to execute this function just before displaying its prompt.
